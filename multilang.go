@@ -29,3 +29,12 @@ func Get(lang string, key string) (string, bool) {
 	val, ok := (*l)[key]
 	return val, ok
 }
+
+func SetLangDict(lang string, landDict *LanguageDictionary) {
+	dict[lang] = landDict
+}
+
+func GetLangDict(lang string, key string) (*LanguageDictionary, bool) {
+	l, ok := dict[lang]
+	return l, ok
+}
