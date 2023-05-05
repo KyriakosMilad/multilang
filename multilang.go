@@ -16,6 +16,7 @@ func Set(lang string, key string, value string) {
 	}
 
 	l := dict[lang]
+	l = &LanguageDictionary{}
 	(*l)[key] = value
 }
 
