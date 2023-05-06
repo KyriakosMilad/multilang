@@ -1,6 +1,8 @@
 package multilang
 
-import "strings"
+import (
+	"strings"
+)
 
 type (
 	LanguageDictionary map[string]string
@@ -54,9 +56,35 @@ func GetDict() *Dictionary {
 }
 
 func replaceVariables(str string, variables *Variables) string {
-	for placeholder, value := range *variables {
-		str = strings.Replace(str, placeholder, value, -1)
+	var builder strings.Builder
+	start := 0
+
+	for {
+		placeholderStart := strings.IndexByte(str[start:], '$')
+		if placeholderStart == -1 {
+			builder.WriteString(str[start:])
+			break
+		}
+
+		builder.WriteString(str[start : start+placeholderStart])
+
+		placeholderEnd := strings.IndexByte(str[start+placeholderStart:], ' ')
+		if placeholderEnd == -1 {
+			placeholderEnd = len(str)
+		} else {
+			placeholderEnd += start + placeholderStart
+		}
+
+		placeholder := str[start+placeholderStart : placeholderEnd]
+
+		if replacement, exists := (*variables)[placeholder]; exists {
+			builder.WriteString(replacement)
+		} else {
+			builder.WriteString(placeholder)
+		}
+
+		start = placeholderEnd
 	}
 
-	return str
+	return builder.String()
 }
