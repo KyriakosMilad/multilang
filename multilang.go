@@ -1,12 +1,13 @@
 package multilang
 
 import (
+	"fmt"
 	"strings"
 )
 
 type (
 	LanguageDictionary map[string]string
-	Variables          map[string]string
+	Variables          map[string]interface{}
 )
 
 type Dictionary struct {
@@ -77,7 +78,8 @@ func (dict *Dictionary) replaceVariables(str string, variables *Variables) strin
 		placeholder := str[start+placeholderStart : placeholderEnd]
 
 		if replacement, exists := (*variables)[placeholder]; exists {
-			builder.WriteString(replacement)
+			replacementString := fmt.Sprint(replacement)
+			builder.WriteString(replacementString)
 		} else {
 			builder.WriteString(placeholder)
 		}
