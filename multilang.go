@@ -6,56 +6,55 @@ import (
 
 type (
 	LanguageDictionary map[string]string
-	Dictionary         map[string]*LanguageDictionary
 	Variables          map[string]string
 )
 
-var (
-	dict = &Dictionary{}
-)
+type Dictionary struct {
+	dict map[string]*LanguageDictionary
+}
 
-func Set(lang string, key string, value string) {
-	if l, ok := (*dict)[lang]; ok {
+func (dict *Dictionary) Set(lang string, key string, value string) {
+	if l, ok := dict.dict[lang]; ok {
 		(*l)[key] = value
 		return
 	}
 
-	l := (*dict)[lang]
-	l = &LanguageDictionary{}
+	l := &LanguageDictionary{}
 	(*l)[key] = value
+	dict.dict[lang] = l
 }
 
-func Get(lang string, key string, variables *Variables) (string, bool) {
-	if _, ok := (*dict)[lang]; !ok {
+func (dict *Dictionary) Get(lang string, key string, variables *Variables) (string, bool) {
+	if _, ok := dict.dict[lang]; !ok {
 		return "", false
 	}
 
-	l := (*dict)[lang]
+	l := dict.dict[lang]
 	val, ok := (*l)[key]
 	if ok {
-		val = replaceVariables(val, variables)
+		val = dict.replaceVariables(val, variables)
 	}
 	return val, ok
 }
 
-func SetLangDict(lang string, landDict *LanguageDictionary) {
-	(*dict)[lang] = landDict
+func (dict *Dictionary) SetLangDict(lang string, landDict *LanguageDictionary) {
+	dict.dict[lang] = landDict
 }
 
-func GetLangDict(lang string, key string) (*LanguageDictionary, bool) {
-	l, ok := (*dict)[lang]
+func (dict *Dictionary) GetLangDict(lang string) (*LanguageDictionary, bool) {
+	l, ok := dict.dict[lang]
 	return l, ok
 }
 
-func SetDict(d *Dictionary) {
-	dict = d
+func (dict *Dictionary) SetDict(d map[string]*LanguageDictionary) {
+	dict.dict = d
 }
 
-func GetDict() *Dictionary {
-	return dict
+func (dict *Dictionary) GetDict() map[string]*LanguageDictionary {
+	return dict.dict
 }
 
-func replaceVariables(str string, variables *Variables) string {
+func (dict *Dictionary) replaceVariables(str string, variables *Variables) string {
 	var builder strings.Builder
 	start := 0
 
